@@ -24,12 +24,24 @@ from rest_framework_simplejwt.views import (
     TokenVerifyView
 )
 
+from emailers.views import *
+
 urlpatterns = [
+    # Default
     path('admin/', admin.site.urls),
 
+    # Auth
     path('api/login/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
     path('api/token/verify/', TokenVerifyView.as_view(), name='token_verify'),
+
+    # EmailBurst
+    path('api/email-burst/', EmailBurstListCreateAPIView.as_view()),
+    path('api/email-burst/<int:pk>/', EmailBurstRetrieveUpdateDestroyAPIView.as_view()),
+
+    # Members (Users)
+    path('api/members/', MemberListCreateAPIView.as_view()),
+    path('api/members/<int:pk>/', MemberRetrieveUpdateDestroyAPIView.as_view()),
 ]
 
 if settings.DEBUG:
