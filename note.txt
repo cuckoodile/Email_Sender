@@ -1,0 +1,30 @@
+great, the recipient is being recorded now, But i was wondering, i did an email send in the front end with a non-staff user with an actual email, and i am waiting for the email to be received, is it supposed to wait for a long time? have you tried the functionality of actually sending an email to the listed recipient/s ?
+
+This is the data that ive actually sent an email to an actual gmail account:
+    {
+        "id": 12,
+        "sender": "admin@gmail.com",
+        "subject": "test?",
+        "body": "gana?",
+        "created_at": "2025-11-18T02:21:01.704860+08:00",
+        "is_sent": false,
+        "sent_at": null,
+        "attachment": null,
+        "recipients": [
+            {
+                "id": 14,
+                "username": "holeeshet68",
+                "email": "holeeshet68@gmail.com",
+                "first_name": "dummy",
+                "middle_name": null,
+                "last_name": "account",
+                "is_verified": false,
+                "is_staff": false
+            }
+        ],
+        "delivery_statuses": [],
+        "total_recipients": 1,
+        "sent_count": 0,
+        "failed_count": 0,
+        "success_rate": 0.0
+    },

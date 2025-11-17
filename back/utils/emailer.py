@@ -2,54 +2,93 @@
 import os
 import smtplib
 from email.message import EmailMessage
-from pathlib import Path
-from dotenv import load_dotenv
+from enum import Enum
+from typing import List, Optional
 
-env_path = Path(__file__).resolve().parent / ".env"
-load_dotenv(dotenv_path=env_path)
+class EmailStatus(Enum):
+    SENT = "sent"
+    FAILED = "failed"
+    NOT_FOUND = "not_found"
+    CONNECTION_ERROR = "connection_error"
+    OTHER_ERROR = "other_error"
 
-sender_email = os.getenv("SENDER_EMAIL")
-password = os.getenv("SENDER_PASSWORD")
-receiver_email = "milo@gmail.com"
-smtp_server = "smtp.gmail.com"
-smtp_port = 587
 
-if not sender_email or not password:
-    raise ValueError("SENDER_EMAIL and SENDER_PASSWORD must be set in .env file")
+class EmailSender:
+    def __init__(self):
+        self.sender_email = os.getenv("SENDER_EMAIL")
+        self.password = os.getenv("SENDER_PASSWORD")
+        self.smtp_server = "smtp.gmail.com"
+        self.smtp_port = 587
 
-msg = EmailMessage()
-msg["Subject"] = "Customized Email from Python"
-msg["From"] = sender_email
-msg["To"] = receiver_email
+        if not self.sender_email or not self.password:
+            raise ValueError("SENDER_EMAIL and SENDER_PASSWORD must be set in .env file")
 
-html_content = """
-<html>
-<body>
-    <h1 style="color: pink; font-family: Arial;">Custom Header (Pink, Arial)</h1>
-    <p>This is <b>bold</b> text in <i>italics</i>, size 16px, red color: 
-       <span style="color: red; font-size: 16px; font-family: Times New Roman;">Custom styled text!</span></p>
-    <p>Large green font: <span style="font-size: 20px; color: green;">Big and Green</span></p>
-    <p>Using CSS class: <span class="highlight">Highlighted!</span></p>
+    def send_single_email(self, receiver_email: str, subject: str, html_content: str, text_content: str = "", attachment_path: str = None):
+        """
+        Send a single email to the specified recipient
+        """
+        msg = EmailMessage()
+        msg["Subject"] = subject
+        msg["From"] = self.sender_email
+        msg["To"] = receiver_email
 
-    <style>
-        .highlight {
-            background-color: yellow;
-            padding: 2px 6px;
-            border-radius: 4px;
-            font-weight: bold;
-        }
-    </style>
-</body>
-</html>
-"""
-msg.add_alternative(html_content, subtype="html")
+        # Add both HTML and plain text content
+        if text_content:
+            msg.set_content(text_content)
+        msg.add_alternative(html_content, subtype="html")
 
-# === Send email ===
-try:
-    with smtplib.SMTP(smtp_server, smtp_port) as server:
-        server.starttls()
-        server.login(sender_email, password)
-        server.send_message(msg)
-    print("Email sent successfully!")
-except Exception as e:
-    print(f"Failed to send email: {e}")
+        # Add attachment if provided
+        if attachment_path:
+            import os
+            from email.mime.base import MIMEBase
+            from email import encoders
+
+            # Extract file name from path
+            filename = os.path.basename(attachment_path)
+
+            # Open and attach the file
+            with open(attachment_path, "rb") as attachment:
+                # Instance of MIMEBase and named as part
+                part = MIMEBase('application', 'octet-stream')
+                part.set_payload(attachment.read())
+
+            # Encode file in ASCII characters to send by email
+            encoders.encode_base64(part)
+
+            # Add header as key/value pair to attachment part
+            part.add_header(
+                'Content-Disposition',
+                f'attachment; filename= {filename}',
+            )
+
+            # Attach the part to message
+            msg.attach(part)
+
+        try:
+            with smtplib.SMTP(self.smtp_server, self.smtp_port) as server:
+                server.starttls()
+                server.login(self.sender_email, self.password)
+                server.send_message(msg)
+            return {"status": EmailStatus.SENT, "message": "Email sent successfully"}
+        except smtplib.SMTPRecipientsRefused:
+            return {"status": EmailStatus.NOT_FOUND, "message": f"Recipient {receiver_email} not found"}
+        except smtplib.SMTPServerDisconnected:
+            return {"status": EmailStatus.CONNECTION_ERROR, "message": "Connection to SMTP server failed"}
+        except smtplib.SMTPException as e:
+            return {"status": EmailStatus.OTHER_ERROR, "message": f"SMTP error: {str(e)}"}
+        except Exception as e:
+            return {"status": EmailStatus.OTHER_ERROR, "message": f"Failed to send email: {str(e)}"}
+
+    def send_bulk_emails(self, receivers: List[str], subject: str, html_content: str, text_content: str = "", attachment_path: str = None):
+        """
+        Send emails to multiple recipients and return the status for each
+        """
+        results = []
+        for receiver in receivers:
+            result = self.send_single_email(receiver, subject, html_content, text_content, attachment_path)
+            results.append({
+                "email": receiver,
+                "status": result["status"],
+                "message": result["message"]
+            })
+        return results

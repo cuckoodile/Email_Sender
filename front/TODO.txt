@@ -1,0 +1,43 @@
+Navigate to ../front/
+
+Analyze my current front end structure and displays.
+
+OVERVIEW:
+Create a React-vite project for doing creating an email letter and sending or burst sending to to a or a list of recipients. This project will also include login authentication system. The project will also include a page for login, register, dashboard, emails, and member fill up form page.
+
+PAGES:
+1. login
+    - A separate page (sibling to App in main.jsx router routes).
+    - A fill up form that prompts a email/username and password.
+    - Include other functionalities such as a toggle button to switch between show/hide characters on password field, Link to register page, and a Login button.
+    - On login succes, navigate the user to dashboard
+
+2. register
+    - A separate page sibling to App and login.
+    - A fill up form that prompts for:
+        - username*
+        - email*
+        - password*
+        - first name
+        - middle name
+        - last name
+        - birthday
+    - Also include a toggle button for show/hide password field characters, A link to login page and a Register button.
+    - On register success, quickly log in the user immediatley to navigate to the dashboard page.
+
+3. dashboard
+    - A children of App and is the index in the routes.
+    - Fetch all the staffs and non-staffs then display them in a shadcn data table where they can filter to staffs or non-staffs only.
+    - Fetch all the emails done in email-burst then display them in another shadcn data table, include pagination of 10 items per page as well (both front end and back end).
+
+4. emails
+    - A children of App and sibling to dashboard in routes.
+    - A page where the staff can compose an email letter where they can freely customize the display such as the texts, spacings, etc. just like in the gmail and add an attachments such as images, files, etc. (allow the backend to handle files and etc.).
+    - The staff have an option to send the composed email to all non-staff members or select a few only or to a single person only
+    - Submit button that triggers the Post email-burst.
+    - Fetch all the email-burst done by the logged staff (include an api view in the backend for getting all email-burst done by the logged user) then display it in a shadcn data table
+
+
+NOTES:
+- Include a Higher Order Component that checks the user if they are logged in before accessing pages like dashboard and emails, else, redirect them to login.
+- Use tanstack query for every API, in my src\api, there is an api-config.js that has an export BASE_URL that you will use for the API fetch URL. There also are dirs for auth, email, and user, Use those dir to contain all the API hook methods (useQuery or useMutation) i.e. useGetUsers, useLogin, usePostEmail, etc.

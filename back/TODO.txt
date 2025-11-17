@@ -1,0 +1,28 @@
+Analyze my current front end structure and displays.
+
+OVERVIEW:
+Create a django with rest-framework project about an emailer where the staffs can send or burst send an email to their members as recipients. The project must be capable of recording the information of the email sent or burst sent such as the subject, body, sender, recipients, and the date the email was created.
+
+Other users can join and be a member of the system by registering their first name, middle name, last name, gmail account, birthday, gender, and address.
+
+The system must also be able to record if the email send was not sent due to the email recipients was not found, connection error, and any other reasons for an email not to be received by the recipient/s.
+
+NOTES:
+- Use Generic views in the views.py.
+- Use rest framework serializers.
+- Use the core>urls.py to contain all the urls of all views, do not use the: include{App.urls.py}
+- Use the .env to contain sensitive informations such as keys, i already have a .env file that contains my email and app key, do not change it and add a .gitignore to not include my sensitive informations.
+- I have a progress already but isnt complete yet, you can just continue my work.
+
+
+
+1. Complete the email sending to the list of recipients when an email-burst is done
+2. Complete API endpoints to handle email sending functionality
+3. Add email delivery status tracking to record failures (not found, connection errors, etc.)
+4. Implement the frontend UI to interact with all backend APIs
+5. Create forms for email composition with recipient selection
+6. Build dashboard views for email history and member management
+7. Use celery, redis, and celery-beat if needed to be able to queue the emailing task or schedule it if needed. Use redis for caching expensive calculations and frequently requested data.
+
+NOTE:
+- You can use the utils/emailer.py for the email sender functionality reference.
